@@ -1,33 +1,40 @@
 var express = require('express');
 var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
+var fs = require('fs');
 var app = express();
 var http = require('http').Server(app);
 
-var jsonData = './UsersData.json';
+var jsonData = require('./UsersData.json');
+
+/* fs.readFile('./UsersData.json', 'utf8', function (err, data) {
+    if (err) throw err;
+    jsonData = data;
+    console.log(jsonData);
+}) */
+
 //Declare MongoDB Schemas
-
-
-userSchema = mongoose.Schema(
+const User = mongoose.model('User',
     {
-        name: {type: String, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid']},
-        username: {type: String, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid']},
-        email: {type: String, lowercase: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid']},
+        name: {type: String},
+        username: {type: String},
+        email: {type: String},
         address:{  
-            street: {type: String, required: [true, "can't be blank"]},
-            suite:{type: String, required: [true, "can't be blank"]},
-            city:{type: String, required: [true, "can't be blank"]},
-            zipcode:{type: String,match: [/^\d{5}(?:[-\s]\d{4})?$/, 'is invalid'], required: [true, "can't be blank"]},
+            street: {type: String, },
+            suite:{type: String },
+            city:{type: String },
+            zipcode:{type: String },
             geo:{
-                longitude:{type: String, required: [true, "can't be blank"]},
-                latitude:{type: String, required: [true, "can't be blank"]}
+                longitude:{type: String },
+                latitude:{type: String }
             }
         },
-        phone: {type: String, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid']},
-        website: {type: String, required: [true, "can't be blank"]},
+        phone: {type: String},
+        website: {type: String },
         company:{
-            name: {type: String, required: [true, "can't be blank"]},
-            catchphrase:{type: String, required: [true, "can't be blank"]},
-            bs:{type: String, required: [true, "can't be blank"]},
+            name: {type: String },
+            catchphrase:{type: String },
+            bs:{type: String },
         }
     })
 
@@ -38,8 +45,8 @@ var dbUrl = 'mongodb+srv://jp121:jp121@cluster0.ciqkl.mongodb.net/<dbname>?retry
 
 
 app.post('/users', (req, res) => {
-  var Users = mongoose.model('User', userSchema, 'UsersData');
-  Users.insertMany(jsonData,(err) =>{ 
+    User.insertMany(jsonData,(err) =>{ 
+    console.log("Success");
   })
 })
 
@@ -50,8 +57,6 @@ mongoose.connect(dbUrl , { useUnifiedTopology: true, useNewUrlParser: true }, (e
         console.log('Successfully mongodb connected');
     }
 })
-
-var db = mongoose.connection;
 
 var server = http.listen(3001, () => {
   console.log('server is running on port', server.address().port);
